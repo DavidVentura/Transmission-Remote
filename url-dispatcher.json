@@ -1,0 +1,10 @@
+[
+  {
+    "protocol": "magnet"
+  },
+  {
+    "protocol": "https",
+    "suffix": ".torrent"
+  }
+]
+
