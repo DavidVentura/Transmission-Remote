@@ -12,6 +12,26 @@ UITK.ListItem {
     property string size_when_done
     property double progress
 
+    signal deleted
+    signal settingsClicked
+
+    leadingActions: UITK.ListItemActions {
+        actions: [
+            UITK.Action {
+                iconName: "delete"
+                onTriggered: deleted()
+            }
+        ]
+    }
+    trailingActions: UITK.ListItemActions {
+        actions: [
+            UITK.Action {
+                iconName: "settings"
+                onTriggered: settingsClicked()
+            }
+        ]
+    }
+
     height: units.gu(8)
     RowLayout {
         anchors.margins: units.gu(1)

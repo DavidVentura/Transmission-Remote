@@ -90,7 +90,7 @@ Dialog {
                     python.call("main.add_magnet",
                                 [magnet.text, downloadPath.text],
                                 function (err) {
-                                    if (err === null) {
+                                    if (err === null || err === undefined) {
                                         PopupUtils.close(dialog)
                                         return
                                     }

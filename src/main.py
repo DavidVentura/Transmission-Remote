@@ -28,6 +28,8 @@ def connect(host, port, use_ssl):
     return True, ""
 
 def list_torrents(name=None, status=None):
+    if not status:
+        status = None
     ti = time.time()
     torrents = {}
     keys = ['id', 'name', 'status', 'leftUntilDone', 'progress', 'sizeWhenDone', 'isFinished', 'isStalled', 'ratio', 'uploadRatio']
@@ -44,7 +46,7 @@ def list_torrents(name=None, status=None):
         torrents[_t.id] = t
         t['eta'] = _t.format_eta()
         t['sizeWhenDone'] = to_human_size(_t.sizeWhenDone)
-    return sorted(torrents.values(), key=lambda x: x['status'] == 'stopped')
+    return sorted(torrents.values(), key=lambda x: x['name'])
 
 def list_files(id):
     ret = []
@@ -83,3 +85,6 @@ def add_magnet(magnet, download_dir):
         c.add_torrent(magnet, download_dir=download_dir)
     except transmission_rpc.error.TransmissionError as e:
         return e.message.replace("Query failed with result ", "")
+
+def delete_torrent(torrent_id, delete_data=False):
+    c.remove_torrent(torrent_id, delete_data)

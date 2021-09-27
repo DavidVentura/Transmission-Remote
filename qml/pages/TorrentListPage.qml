@@ -4,14 +4,16 @@ import QtQuick.Controls 2.12
 import Qt.labs.settings 1.0
 
 import Ubuntu.Components.Popups 1.3
-import Ubuntu.Components 1.3
+import Ubuntu.Components 1.3 as UITK
 import QtGraphicalEffects 1.0
 
 import "../components"
 
-Page {
+UITK.Page {
     property bool searchMode: false
     property bool connected: false
+    property string torrentStatus: null
+
     Settings {
         id: settings
         property string host
@@ -19,17 +21,19 @@ Page {
         property int port: 443
     }
 
-    header: PageHeader {
+    header: UITK.PageHeader {
         title: "Torrents"
         contents: Item {
             anchors.fill: parent
-            anchors.margins: units.gu(1)
-            Label {
+            anchors.topMargin: units.gu(1)
+            anchors.bottomMargin: units.gu(1)
+            UITK.Label {
                 visible: !searchMode
                 anchors.verticalCenter: parent.verticalCenter
+                textSize: Label.Large
                 text: "Torrents"
             }
-            TextField {
+            UITK.TextField {
                 anchors.fill: parent
                 id: torrentFilter
                 text: ""
@@ -44,14 +48,14 @@ Page {
         }
 
         leadingActionBar.actions: [
-            Action {
+            UITK.Action {
                 iconName: "settings"
                 onTriggered: stack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
         ]
         trailingActionBar.actions: [
 
-            Action {
+            UITK.Action {
                 enabled: connected
                 iconName: "add"
                 onTriggered: {
@@ -59,7 +63,7 @@ Page {
                                     null, {})
                 }
             },
-            Action {
+            UITK.Action {
                 enabled: connected
                 id: sort
                 iconName: "filters"
@@ -67,7 +71,7 @@ Page {
                     menu.open()
                 }
             },
-            Action {
+            UITK.Action {
                 enabled: connected
                 iconName: "toolkit_input-search"
                 onTriggered: {
@@ -103,19 +107,28 @@ Page {
                 color: "#999"
             }
         }
-
-        MenuItem {
-            Label {
-                text: i18n.tr("Active")
-                anchors {
-                    left: parent.left
-                    leftMargin: units.gu(1)
-                    verticalCenter: parent.verticalCenter
-                }
-                height: units.gu(2)
-            }
+        MenuPanelItem {
+            label: i18n.tr("All")
+            iconName: torrentStatus == "" ? "tick" : ""
             onTriggered: {
-                console.log("sh")
+                torrentStatus = ""
+                loadTorrents()
+            }
+        }
+        MenuPanelItem {
+            label: i18n.tr("Downloading")
+            iconName: torrentStatus == "downloading" ? "tick" : ""
+            onTriggered: {
+                torrentStatus = "downloading"
+                loadTorrents()
+            }
+        }
+        MenuPanelItem {
+            label: i18n.tr("Seeding")
+            iconName: torrentStatus == "seeding" ? "tick" : ""
+            onTriggered: {
+                torrentStatus = "seeding"
+                loadTorrents()
             }
         }
     }
@@ -127,12 +140,23 @@ Page {
             id: listModel
         }
         delegate: TorrentItem {
-            name: listModel.get(index).name
-            progress: listModel.get(index).progress
-            status: listModel.get(index).status
-            eta: listModel.get(index).eta
+            name: model.name
+            progress: model.progress
+            status: model.status
+            eta: model.eta
 
             size_when_done: sizeWhenDone.toString()
+            onDeleted: PopupUtils.open(Qt.resolvedUrl(
+                                           "../popups/DeleteTorrent.qml"),
+                                       null, {
+                                           "itemName": model.name,
+                                           "itemID": model.id
+                                       })
+            onSettingsClicked: stack.push(Qt.resolvedUrl("TorrentDetails.qml"),
+                                          {
+                                              "itemName": name,
+                                              "itemID": model.id
+                                          })
         }
     }
 
@@ -179,11 +203,19 @@ Page {
     }
 
     function loadTorrents() {
-        python.call("main.list_torrents", [torrentFilter.text],
+        python.call("main.list_torrents", [torrentFilter.text, torrentStatus],
                     function (items) {
-                        listModel.clear()
+                        if (items.length < listModel.count) {
+                            listModel.clear()
+                        }
+                        const itemCount = listModel.count
+
                         for (var i = 0; i < items.length; i++) {
-                            listModel.append(items[i])
+                            if (i >= itemCount) {
+                                listModel.append(items[i])
+                            } else {
+                                listModel.set(i, items[i])
+                            }
                         }
                     })
     }
@@ -196,7 +228,6 @@ Page {
         python.call('main.connect', [settings.value("host"), settings.value(
                                          "port"), settings.value("use_ssl")],
                     function (ret) {
-                        console.log(ret)
                         var success = ret[0]
                         var error = ret[1]
                         if (success) {

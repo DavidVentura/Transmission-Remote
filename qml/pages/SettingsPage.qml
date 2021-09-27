@@ -7,6 +7,9 @@ import Qt.labs.settings 1.0
 import Ubuntu.Components 1.3
 
 Page {
+    header: PageHeader {
+        title: "Settings"
+    }
     Settings {
         id: settings
         property string host
@@ -15,7 +18,8 @@ Page {
     }
     Column {
         anchors.fill: parent
-        //        anchors.topMargin: parent.header.height
+        anchors.margins: units.gu(2)
+        anchors.topMargin: parent.header.height + anchors.margins
         spacing: units.gu(2)
 
         RowLayout {

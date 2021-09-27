@@ -18,9 +18,8 @@ MenuItem {
             leftMargin: units.gu(1)
             verticalCenter: parent.verticalCenter
         }
-        width: visible ? units.gu(3) : 0
+        width: units.gu(3)
         height: width
-        visible: menu_icon.name != ""
         color: Theme.palette.normal.backgroundSecondaryText
     }
 
