@@ -10,11 +10,22 @@ sys.path.insert(0, vendored)
 
 import transmission_rpc
 
-c = transmission_rpc.Client(protocol='https', host='transmission.test.dev', port=443)
+c = None
 
 ONE_TB = 2 ** 40
 ONE_GB = 2 ** 30
 ONE_MB = 2 ** 20
+
+def connect(host, port, use_ssl):
+    global c
+    try:
+        port = int(port)
+        protocol = 'https' if use_ssl else 'http'
+        c = transmission_rpc.Client(protocol=protocol, host=host, port=port, timeout=2)
+    except Exception as e:
+        return False, str(e)
+
+    return True, ""
 
 def list_torrents(name=None, status=None):
     ti = time.time()
@@ -33,7 +44,6 @@ def list_torrents(name=None, status=None):
         torrents[_t.id] = t
         t['eta'] = _t.format_eta()
         t['sizeWhenDone'] = to_human_size(_t.sizeWhenDone)
-    print(time.time() - ti, flush=True)
     return sorted(torrents.values(), key=lambda x: x['status'] == 'stopped')
 
 def list_files(id):

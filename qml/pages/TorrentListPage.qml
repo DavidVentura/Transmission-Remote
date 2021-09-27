@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import io.thp.pyotherside 1.3
 import QtQuick.Controls 2.12
+import Qt.labs.settings 1.0
 
 import Ubuntu.Components.Popups 1.3
 import Ubuntu.Components 1.3
@@ -10,6 +11,14 @@ import "../components"
 
 Page {
     property bool searchMode: false
+    property bool connected: false
+    Settings {
+        id: settings
+        property string host
+        property bool use_ssl: true
+        property int port: 443
+    }
+
     header: PageHeader {
         title: "Torrents"
         contents: Item {
@@ -36,12 +45,14 @@ Page {
 
         leadingActionBar.actions: [
             Action {
-                iconName: "contextual-menu"
+                iconName: "settings"
+                onTriggered: stack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
         ]
         trailingActionBar.actions: [
 
             Action {
+                enabled: connected
                 iconName: "add"
                 onTriggered: {
                     PopupUtils.open(Qt.resolvedUrl("../popups/AddTorrent.qml"),
@@ -49,6 +60,7 @@ Page {
                 }
             },
             Action {
+                enabled: connected
                 id: sort
                 iconName: "filters"
                 onTriggered: {
@@ -56,6 +68,7 @@ Page {
                 }
             },
             Action {
+                enabled: connected
                 iconName: "toolkit_input-search"
                 onTriggered: {
                     searchMode = !searchMode
@@ -107,6 +120,7 @@ Page {
         }
     }
     ListView {
+        visible: connected
         anchors.topMargin: parent.header.height
         anchors.fill: parent
         model: ListModel {
@@ -122,8 +136,43 @@ Page {
         }
     }
 
+    Column {
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: units.gu(2)
+        spacing: units.gu(1)
+
+        Label {
+            id: connectedLabel
+            anchors.left: parent.left
+            anchors.right: parent.right
+            visible: !connected
+            text: "Not connected. Check settings."
+            wrapMode: Label.WordWrap
+        }
+        Label {
+            id: connectionErrorLabel
+            anchors.left: parent.left
+            anchors.right: parent.right
+            visible: !connected
+            text: ""
+            color: "red"
+            font.bold: true
+            wrapMode: Label.WrapAtWordBoundaryOrAnywhere
+        }
+        Button {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            visible: !connected
+            text: "Connect"
+            onClicked: connect()
+        }
+    }
+
     Timer {
         id: timer
+        running: connected
         repeat: true
         interval: 5000
         onTriggered: loadTorrents()
@@ -138,14 +187,33 @@ Page {
                         }
                     })
     }
+    function connect() {
+        if (settings.host === null || settings.host === undefined) {
+            connectionErrorLabel.text = "Host is unset"
+            return
+        }
+
+        python.call('main.connect', [settings.value("host"), settings.value(
+                                         "port"), settings.value("use_ssl")],
+                    function (ret) {
+                        console.log(ret)
+                        var success = ret[0]
+                        var error = ret[1]
+                        if (success) {
+                            connected = true
+                            loadTorrents()
+                            return
+                        }
+                        connectionErrorLabel.text = error
+                    })
+    }
 
     Python {
         id: python
         Component.onCompleted: {
             addImportPath(Qt.resolvedUrl('../../src/'))
             importModule('main', function () {
-
-                loadTorrents()
+                connect()
             })
         }
     }
