@@ -12,7 +12,7 @@ Page {
     property int itemID
 
     header: PageHeader {
-        title: "Torrent Details"
+        title: i18n.tr("Torrent Details")
     }
     Column {
         id: col
@@ -31,7 +31,7 @@ Page {
             wrapMode: Label.WrapAtWordBoundaryOrAnywhere
         }
         Label {
-            text: "Files"
+            text: i18n.tr("Files")
         }
     }
     ListView {
