@@ -11,17 +11,17 @@ Dialog {
 
         UITK.Button {
             enabled: magnet.text === ""
-            text: "Pick a torrent file"
+            text: i18n.tr("Pick a torrent file")
             anchors.left: parent.left
             anchors.right: parent.right
         }
         UITK.Label {
-            text: "OR"
+            text: i18n.tr("OR")
             anchors.horizontalCenter: parent.horizontalCenter
             textSize: UITK.Label.Small
         }
         UITK.Label {
-            text: "Magnet"
+            text: i18n.tr("Magnet")
         }
         UITK.TextField {
             id: magnet
@@ -33,7 +33,7 @@ Dialog {
         UITK.Label {
             anchors.left: parent.left
             anchors.right: parent.right
-            text: "Destination folder"
+            text: i18n.tr("Destination folder")
         }
         UITK.Label {
             id: destinationDetails
@@ -48,7 +48,7 @@ Dialog {
             id: downloadPath
             anchors.left: parent.left
             anchors.right: parent.right
-            text: "/media/downloads"
+            text: i18n.tr("/media/downloads")
             onTextChanged: {
                 if (error !== null) {
                     error.text = ""
@@ -73,7 +73,7 @@ Dialog {
             enabled: pathOk
             anchors.right: parent.right
             anchors.left: parent.left
-            text: "Confirm"
+            text: i18n.tr("Confirm")
             color: "green"
             onClicked: {
                 if (magnet.text === "") {
