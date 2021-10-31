@@ -8,7 +8,7 @@ import Ubuntu.Components 1.3
 
 Page {
     header: PageHeader {
-        title: "Settings"
+        title: i18n.tr("Settings")
     }
     Settings {
         id: settings
@@ -26,7 +26,7 @@ Page {
             anchors.left: parent.left
             anchors.right: parent.right
             Label {
-                text: "Hostname"
+                text: i18n.tr("Hostname")
                 Layout.fillWidth: true
             }
             TextField {
@@ -38,7 +38,7 @@ Page {
             anchors.left: parent.left
             anchors.right: parent.right
             Label {
-                text: "Port"
+                text: i18n.tr("Port")
                 Layout.fillWidth: true
             }
             TextField {
@@ -51,7 +51,7 @@ Page {
             anchors.left: parent.left
             anchors.right: parent.right
             Label {
-                text: "Use SSL"
+                text: i18n.tr("Use SSL")
                 Layout.fillWidth: true
             }
 
