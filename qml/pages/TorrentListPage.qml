@@ -22,7 +22,7 @@ UITK.Page {
     }
 
     header: UITK.PageHeader {
-        title: "Torrents"
+        title: i18n.tr("Torrents")
         contents: Item {
             anchors.fill: parent
             anchors.topMargin: units.gu(1)
@@ -31,7 +31,7 @@ UITK.Page {
                 visible: !searchMode
                 anchors.verticalCenter: parent.verticalCenter
                 textSize: Label.Large
-                text: "Torrents"
+                text: i18n.tr("Torrents")
             }
             UITK.TextField {
                 anchors.fill: parent
