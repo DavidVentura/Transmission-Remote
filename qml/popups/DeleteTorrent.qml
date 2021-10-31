@@ -12,7 +12,7 @@ Dialog {
     Column {
         spacing: units.gu(1)
         UITK.Label {
-            text: "Delete " + itemName
+            text: i18n.tr("Delete ") + itemName
             wrapMode: UITK.Label.WrapAtWordBoundaryOrAnywhere
             anchors.left: parent.left
             anchors.right: parent.right
@@ -22,7 +22,7 @@ Dialog {
             anchors.right: parent.right
             UITK.Label {
                 Layout.fillWidth: true
-                text: "Delete data"
+                text: i18n.tr("Delete data")
             }
             UITK.Switch {
                 checked: false
@@ -31,7 +31,7 @@ Dialog {
         }
 
         UITK.Button {
-            text: "Delete"
+            text: i18n.tr("Delete")
             anchors.left: parent.left
             anchors.right: parent.right
             color: "#ED3146"
@@ -43,7 +43,7 @@ Dialog {
             }
         }
         UITK.Button {
-            text: "Cancel"
+            text: i18n.tr("Cancel")
             anchors.left: parent.left
             anchors.right: parent.right
             onTriggered: PopupUtils.close(dialog)
